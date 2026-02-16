@@ -54,27 +54,33 @@ export default async function handler(req, res) {
 }
 ```
 
-**コピー方法**：
-1. 上のコードブロック全体を選択（`export` から最後の `}` まで）
-2. **Ctrl+C**（Windowsの場合）または **Cmd+C**（Macの場合）
-3. GitHubの編集エリアをクリック
-4. **Ctrl+V**（または **Cmd+V**）で貼り付け
+**重要**：
+- ✅ `export default` で始まり、最後の `}` で終わる
+- ✅ このJavaScriptコードだけ
+- ❌ 説明文、マークダウン、コメント欄の説明は一切含めない
 
 ---
 
-### ステップ5: 保存
+### ステップ4: 保存
 
 1. 下にスクロール
-2. **「Commit new file」** という緑のボタンをクリック
+2. **「Commit changes」** をクリック
+3. ポップアップが出たら再度 **「Commit changes」**
 
 ---
 
-### ステップ6: 確認
+### ステップ5: Vercelの自動再デプロイを待つ
 
-リポジトリのメインページに戻ると、以下のようになっているはずです：
+保存すると、**Vercelが自動的に再デプロイ**します。
+
+**待ち時間**: 1-2分
+
+---
+
+### ステップ6: 動作確認
+
+1. **1-2分待つ**
+
+2. **アプリのページをリロード**（F5）
 ```
-📁 api/                  ← フォルダが作成された！
-  └─ 📄 chat.js         ← この中にファイルがある
-📄 vercel.json
-📄 english-buddy.html
-📄 README.md
+   https://english-buddy-zeta.vercel.app/
