@@ -463,8 +463,8 @@
             // リセットボタンを表示
             document.getElementById('resetButton').classList.remove('hidden');
         }
-
-        // Claude APIで応答を取得
+        
+    // Claude APIで応答を取得
         async function getAIResponse(userMessage) {
             try {
                 updateButtonState('speaking');
@@ -475,14 +475,14 @@
                     { role: 'user', content: userMessage }
                 ];
 
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                // プロキシサーバー経由でAPIを呼び出し
+                const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': ANTHROPIC_API_KEY,
-                        'anthropic-version': '2023-06-01'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
+                        apiKey: ANTHROPIC_API_KEY,
                         model: 'claude-3-5-haiku-20241022',
                         max_tokens: 100,
                         system: `You are a friendly, encouraging English teacher teddy bear helping a Japanese child learn English. 
@@ -495,7 +495,7 @@ Rules:
 - Praise their efforts
 - If they make a mistake, gently correct by repeating correctly
 - Use child-friendly topics: animals, colors, food, family, toys`,
-                        messages: messages.slice(-6) // 最新3往復のみ保持
+                        messages: messages.slice(-6)
                     })
                 });
 
@@ -543,7 +543,7 @@ Rules:
                 updateButtonState('idle');
                 console.log('音声再生終了');
             };
-
+            
             utterance.onerror = (event) => {
                 console.error('音声合成エラー:', event);
                 updateButtonState('idle');
