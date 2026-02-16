@@ -1,0 +1,32 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
+```
+
+**コピー方法**：
+1. 上の { から } までを全部選択
+2. Ctrl+C（Windowsの場合）または Cmd+C（Macの場合）
+3. GitHubの編集エリアでCtrl+V（またはCmd+V）
+
+---
+
+### ステップ6: 保存
+
+1. 下にスクロール
+2. **「Commit new file」** という緑のボタンをクリック
+
+---
+
+### ステップ7: 確認
+
+リポジトリのメインページに戻ると、ファイル一覧に以下が表示されているはずです：
+```
+📁 api/
+📄 vercel.json        ← これが追加された！
+📄 english-buddy.html
+📄 README.md
