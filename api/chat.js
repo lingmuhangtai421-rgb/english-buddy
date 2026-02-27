@@ -12,26 +12,41 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { apiKey, messages, model, max_tokens, system } = req.body;
+    const { apiKey, messages, system } = req.body;
 
     if (!apiKey) {
       return res.status(400).json({ error: 'API key is required' });
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: model || 'claude-3-5-haiku-20241022',
-        max_tokens: max_tokens || 100,
-        system: system || '',
-        messages: messages
-      })
-    });
+    // メッセージを整形（最新のユーザーメッセージのみ使用）
+    const userMessage = messages[messages.length - 1].content;
+    
+    // システムプロンプトとユーザーメッセージを結合
+    const fullPrompt = system 
+      ? `${system}\n\nUser: ${userMessage}\nAssistant:`
+      : userMessage;
+
+    // Google Gemini APIを呼び出し
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: fullPrompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.9,
+            maxOutputTokens: 100,
+          }
+        })
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -39,7 +54,19 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    return res.status(200).json(data);
+    
+    // Geminiのレスポンスを整形
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not understand.';
+    
+    // Claude互換のレスポンス形式に変換
+    const claudeFormat = {
+      content: [{
+        type: 'text',
+        text: text.trim()
+      }]
+    };
+
+    return res.status(200).json(claudeFormat);
 
   } catch (error) {
     console.error('Proxy error:', error);
@@ -49,3 +76,6 @@ export default async function handler(req, res) {
     });
   }
 }
+
+
+
