@@ -278,7 +278,7 @@
 
             <!-- APIキー入力セクション -->
             <div id="apiKeySection" class="api-key-section">
-                <h3>🔑 Anthropic APIキーを入力</h3>
+                <h3>🔑 Google Gemini APIキーを入力</h3>
                 <input 
                     type="password" 
                     id="apiKeyInput" 
@@ -287,7 +287,7 @@
                 >
                 <button class="save-key-button" onclick="saveApiKey()">保存して開始</button>
                 <p style="color: #666; font-size: 12px; margin-top: 10px;">
-                    ※ APIキーは <a href="https://console.anthropic.com/" target="_blank" style="color: #667eea;">console.anthropic.com</a> で取得できます
+                    ※ APIキーは <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #667eea;">Google AI Studio</a> で取得できます
                 </p>
             </div>
 
@@ -335,9 +335,10 @@
                 return;
             }
 
-            if (!key.startsWith('sk-ant-')) {
-                showError('正しいAPIキー形式ではありません（sk-ant-で始まる必要があります）');
-                return;
+            if (!key.startsWith('AIza')) {
+    showError('正しいAPIキー形式ではありません（AIzaで始まる必要があります）');
+    return;
+}
             }
 
             ANTHROPIC_API_KEY = key;
