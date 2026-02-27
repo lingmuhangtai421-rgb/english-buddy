@@ -249,7 +249,6 @@
             display: none;
         }
 
-        /* モバイル対応 */
         @media (max-width: 600px) {
             .teddy-bear {
                 font-size: 80px;
@@ -276,7 +275,6 @@
             <div class="teddy-bear">🧸</div>
             <h1 class="title">English Buddy</h1>
 
-            <!-- APIキー入力セクション -->
             <div id="apiKeySection" class="api-key-section">
                 <h3>🔑 Google Gemini APIキーを入力</h3>
                 <input 
@@ -291,7 +289,6 @@
                 </p>
             </div>
 
-            <!-- メインアプリ（初期は非表示） -->
             <div id="mainApp" class="hidden">
                 <div id="errorMessage" class="error-message hidden"></div>
 
@@ -319,13 +316,11 @@
     </div>
 
     <script>
-        // グローバル変数
-        let ANTHROPIC_API_KEY = '';
+        let GEMINI_API_KEY = '';
         let conversationHistory = [];
         let isListening = false;
         let isSpeaking = false;
 
-        // APIキーを保存
         function saveApiKey() {
             const input = document.getElementById('apiKeyInput');
             const key = input.value.trim();
@@ -336,30 +331,26 @@
             }
 
             if (!key.startsWith('AIza')) {
-    showError('正しいAPIキー形式ではありません（AIzaで始まる必要があります）');
-    return;
-}
+                showError('正しいAPIキー形式ではありません（AIzaで始まる必要があります）');
+                return;
             }
 
-            ANTHROPIC_API_KEY = key;
-            localStorage.setItem('anthropic_api_key', key);
+            GEMINI_API_KEY = key;
+            localStorage.setItem('gemini_api_key', key);
 
-            // UI切り替え
             document.getElementById('apiKeySection').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
         }
 
-        // ページ読み込み時にAPIキーをチェック
         window.addEventListener('load', () => {
-            const savedKey = localStorage.getItem('anthropic_api_key');
+            const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) {
-                ANTHROPIC_API_KEY = savedKey;
+                GEMINI_API_KEY = savedKey;
                 document.getElementById('apiKeySection').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
             }
         });
 
-        // エラーメッセージ表示
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
@@ -369,7 +360,6 @@
             }, 5000);
         }
 
-        // ボタンの状態を更新
         function updateButtonState(state) {
             const button = document.getElementById('talkButton');
             button.className = 'talk-button';
@@ -392,7 +382,6 @@
             }
         }
 
-        // 音声認識を開始
         function startListening() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
@@ -415,10 +404,7 @@
                 const text = event.results[0][0].transcript;
                 console.log('認識されたテキスト:', text);
                 
-                // ユーザーメッセージを表示
                 addMessage('user', text);
-                
-                // Claude APIで応答を生成
                 await getAIResponse(text);
             };
 
@@ -445,7 +431,6 @@
             recognition.start();
         }
 
-        // メッセージを追加
         function addMessage(type, text) {
             const conversation = document.getElementById('conversation');
             const messageDiv = document.createElement('div');
@@ -461,31 +446,25 @@
             conversation.appendChild(messageDiv);
             conversation.scrollTop = conversation.scrollHeight;
 
-            // リセットボタンを表示
             document.getElementById('resetButton').classList.remove('hidden');
         }
-        
-    // Claude APIで応答を取得
+
         async function getAIResponse(userMessage) {
             try {
                 updateButtonState('speaking');
 
-                // 会話履歴を作成
                 const messages = [
                     ...conversationHistory,
                     { role: 'user', content: userMessage }
                 ];
 
-                // プロキシサーバー経由でAPIを呼び出し
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        apiKey: ANTHROPIC_API_KEY,
-                        model: 'claude-3-5-haiku-20241022',
-                        max_tokens: 100,
+                        apiKey: GEMINI_API_KEY,
                         system: `You are a friendly, encouraging English teacher teddy bear helping a Japanese child learn English. 
 
 Rules:
@@ -510,16 +489,13 @@ Rules:
                 
                 console.log('AI応答:', aiResponse);
 
-                // AIメッセージを表示
                 addMessage('ai', aiResponse);
 
-                // 会話履歴を更新
                 conversationHistory.push(
                     { role: 'user', content: userMessage },
                     { role: 'assistant', content: aiResponse }
                 );
 
-                // 音声で読み上げ
                 speak(aiResponse);
 
             } catch (error) {
@@ -529,22 +505,20 @@ Rules:
             }
         }
 
-        // 音声合成
         function speak(text) {
-            // 既存の音声を停止
             window.speechSynthesis.cancel();
 
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.85; // 少しゆっくり
-            utterance.pitch = 1.2; // 少し高めで親しみやすく
+            utterance.rate = 0.85;
+            utterance.pitch = 1.2;
             utterance.volume = 1.0;
 
             utterance.onend = () => {
                 updateButtonState('idle');
                 console.log('音声再生終了');
             };
-            
+
             utterance.onerror = (event) => {
                 console.error('音声合成エラー:', event);
                 updateButtonState('idle');
@@ -553,7 +527,6 @@ Rules:
             window.speechSynthesis.speak(utterance);
         }
 
-        // 会話をリセット
         function resetConversation() {
             conversationHistory = [];
             document.getElementById('conversation').innerHTML = '';
@@ -564,3 +537,4 @@ Rules:
     </script>
 </body>
 </html>
+
